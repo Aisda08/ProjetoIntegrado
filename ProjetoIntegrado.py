@@ -1,51 +1,77 @@
-'''
-Pacotes a serem instalados antes de rodar o código:
-    1. opencv-python
-    2. cmake
-    3. dlib
-    4. face_recognition
-
-Passo a passo para instalar os pacotes:
-    1. Pressione Win + R.
-    2. Digite CMD e aperte Enter.
-    3. Escreva "pip install opencv-python".
-    4. Escreva "pip install cmake".
-    5. Reinicie o computador.
-    6. Repita o passo 1 e 2.
-    7. Escreva "pip install dlib".
-    4. Escreva "pip install face_recognition".
-'''
-
 import cv2
 import face_recognition
+import time
 
-cap = cv2.VideoCapture(0) # Acessa a câmera.
+import psycopg2
+from psycopg2 import sql
 
-while True:
-    _, img = cap.read() # Captura um frame da câmera.
-    img = cv2.flip(img, 1) # Inverte imagem na horizontal.
 
-    grayImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # Converte img para escalas de cinza.
+# Configurações da conexão com o banco de dados
+db_config = {
+    "host": "localhost",
+    "database": "projeto_integrado",
+    "user": "postgres",
+    "password": "", # Adicionar password
+    "port": "5432"
+}
 
-    if len(faces) > 0: # Se detectar rostos.
-        # Ordena os rostos pela área do rosto, do maior para o menor.
-        faces = sorted(faces, key=lambda f: f[2] * f[3], reverse=True) 
-        (x, y, w, h) = faces[0] # Seleciona apenas o maior rosto na imagem.
+# Conecta ao banco de dados.
+conn = psycopg2.connect(**db_config)
+cursor = conn.cursor()
 
-        match = None
+camCapture = cv2.VideoCapture(0) # Acessa a câmera.
 
-        label = "Reconhecido" if match else "Desconhecido"
-        color = (0, 255, 0) if match else (0, 0, 255) # Blue, Green, Red
+try:
+    while True:
+        _, frame = camCapture.read() # lê um frame da câmera.
+        frame = cv2.flip(frame, 1) # Inverte imagem na horizontal.
 
-        cv2.rectangle(img, (x, y), (x+w, y+h), color, 3) # Desenha um retângulo na tela.
-        cv2.putText(img, label, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2) # Escreve label na tela.
+        faces_loc = face_recognition.face_locations(frame) # Detecta os rostos.
+        if faces_loc: 
+            faces_loc = sorted(faces_loc, 
+                        key=lambda f: (f[2] - f[0]) * (f[1] - f[3]), 
+                        reverse=True) # Ordena do maior para o menor.
+            faces_loc = [faces_loc[0]] # Seleciona apenas o maior rosto na imagem.
+        
+        faces_enc = face_recognition.face_encodings(frame, faces_loc) # Codifica rosto.
 
-    title = "Projeto Integrado - Reconhecimento Facial"
-    cv2.imshow(title, img) # Exibe o frame.
+        if faces_enc: # se codificar algum rosto.
+            cursor.execute("SELECT nome, face_encode FROM funcionario")
+            db_encodings = cursor.fetchall()
 
-    key = cv2.waitKey(1) # Espera por 1ms para uma tecla ser pressionada.
-    if key == ord('q'):
-        break
+            # Converte os encodings do banco para o formato do face_recognition
+            known_encodings = []
+            known_names = []
+            for name, enc in db_encodings:
+                known_names.append(name)
+                known_encodings.append(enc)
 
-cap.release()
-cv2.destroyAllWindows()
+            # Compara com os encodings conhecidos
+            matches = face_recognition.compare_faces(known_encodings, faces_enc[0])
+
+            if True in matches:
+                    match_index = matches.index(True)
+                    label = f"Reconhecido: {known_names[match_index]}"
+                    color = (0, 255, 0)
+            else:
+                label = "Desconhecido"
+                color = (0, 0, 255)
+
+            for (top, right, bottom, left), face_encoding in zip(faces_loc, faces_enc):
+                cv2.rectangle(frame, (left, top), (right, bottom), color, 2) # Desenha um retângulo ao redor do rosto.
+                cv2.putText(frame, label, (left, top - 10), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2) # Escreve label na tela.
+
+        title = "Projeto Integrado - Reconhecimento Facial"
+        cv2.imshow(title, frame) # Exibe o frame.
+
+        key = cv2.waitKey(1) # Espera por 1ms para uma tecla ser pressionada.
+        if key == ord('q'):
+            break
+
+finally:
+    # Libera recursos no final
+    camCapture.release()
+    cv2.destroyAllWindows()
+    cursor.close()
+    conn.close()
