@@ -69,8 +69,7 @@ try:
         if key == ord('q'):
             break
 
-finally:
-    # Libera recursos no final.
+finally: # Libera recursos no final.
     camCapture.release()
     cv2.destroyAllWindows()
     cursor.close()

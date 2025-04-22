@@ -1,4 +1,5 @@
 Instale a versão 3.10.0 do Python no site: https://www.python.org/downloads/release/python-3100/
+(Certifique-se de marcar "Add Python 3.10 to PATH" durante a instalação)
 
 Instale o PostgreSQL no site: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 
@@ -22,10 +23,10 @@ Para instalar o Dlib é necessário ter o CMake e um compitaldor C++ instalados.
                 Desenvolvimento para desktop com C++.
                 Ferramentas do C++ para desenvolvimento em Linux.
             Em "Componentes individuais":
-                Todos SDK's do Windows 10 ou Windows 11 (Baseado na versão do seu sistema).
+                Todos SDK do Windows 10 ou Windows 11 (Baseado na versão do seu sistema).
 
 Passo a passo para instalar os pacotes:
-    1. Pressione Win + R.
+    1. Pressione Win + R simultâneamente.
     2. Digite CMD e aperte Enter.
     3. Escreva "pip install opencv-python".
     7. Escreva "pip install dlib".
