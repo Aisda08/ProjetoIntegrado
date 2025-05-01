@@ -1,22 +1,10 @@
 import cv2
 import face_recognition
 import time
-
-import psycopg2
-from psycopg2 import sql
-
-
-# Configurações da conexão com o banco de dados
-db_config = {
-    "host": "localhost",
-    "database": "projeto_integrado",
-    "user": "postgres",
-    "password": "12345678",
-    "port": "5432"
-}
+from database import db
 
 # Conecta ao banco de dados.
-conn = psycopg2.connect(**db_config)
+conn = db.conectar()
 cursor = conn.cursor()
 
 camCapture = cv2.VideoCapture(0) # Acessa a câmera.
@@ -24,7 +12,7 @@ camCapture = cv2.VideoCapture(0) # Acessa a câmera.
 try:
     while True:
         _, frame = camCapture.read() # lê um frame da câmera.
-        frame = cv2.flip(frame, 1) # Inverte imagem na horizontal.
+        frame = cv2.flip(frame, 1) # Inverte frame na horizontal.
 
         faces_loc = face_recognition.face_locations(frame) # Detecta os rostos.
         if faces_loc: 

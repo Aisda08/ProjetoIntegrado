@@ -1,34 +1,23 @@
-Instale a versão 3.10.0 do Python no site: https://www.python.org/downloads/release/python-3100/
-(Certifique-se de marcar "Add Python 3.10 to PATH" durante a instalação)
-
-Instale o PostgreSQL no site: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
-
-Pacotes a serem instalados antes de rodar o código:
-    1. opencv-python
-    2. dlib
-    3. face_recognition
-    4. psycopg2
-
-Para instalar o Dlib é necessário ter o CMake e um compitaldor C++ instalados.
-    Passo a passo de instalação do CMake:
-        1. Acesse: https://cmake.org/download/
-        2. Baixe a versão "cmake-windows-x86_64.msi"
-        3. Durante a instalação marque a opção "add CMake to the PATH environment variable".
-
-    Passo a passo de instalação do compilador C++:
-        1. Após a instalação do CMake, acesse: https://visualstudio.microsoft.com/visual-cpp-build-tools/
-        2. Selecione "Baixar Ferramentas de Compilação".
-        3. Durante a instalação, selecione:
+Aplicativos necessários para rodar o sistema:
+    1. Instale a versão 3.10.0 do Python no site: https://www.python.org/downloads/release/python-3100/
+        (Durante a instalação marque a opção "Add Python 3.10 to PATH")
+    2. Instale o CMake no site: https://cmake.org/download/
+        (Durante a instalação marque a opção "add CMake to the PATH environment variable")
+    3. Instale um compilador C++ no site: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+        Durante a instalação, selecione:
             Em Cargas de trabalho: 
                 Desenvolvimento para desktop com C++.
                 Ferramentas do C++ para desenvolvimento em Linux.
             Em "Componentes individuais":
                 Todos SDK do Windows 10 ou Windows 11 (Baseado na versão do seu sistema).
+    2. Instale o PostgreSQL no site: https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 
-Passo a passo para instalar os pacotes:
-    1. Pressione Win + R simultâneamente.
-    2. Digite CMD e aperte Enter.
-    3. Escreva "pip install opencv-python".
-    7. Escreva "pip install dlib".
-    4. Escreva "pip install face_recognition".
-    5. Escreva "pip install psycopg2".
+Passo a passo para instalar os pacotes Python:
+    1. Pressione Windows + R simultâneamente.
+    2. Digite "CMD" e aperte Enter.
+    3. Escreva: pip install opencv-python
+    7. Escreva: pip install dlib
+    4. Escreva: pip install face_recognition
+    5. Escreva: pip install psycopg2
+    6. Escreva: pip install fastapi
+    7. Escreva: pip install uvicorn

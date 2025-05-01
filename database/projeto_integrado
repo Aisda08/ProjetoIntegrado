@@ -1,0 +1,65 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 17.4
+-- Dumped by pg_dump version 17.4
+
+-- Started on 2025-04-24 09:34:24
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 217 (class 1259 OID 16385)
+-- Name: funcionario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.funcionario (
+    cpf character(11) NOT NULL,
+    nome character varying(70) NOT NULL,
+    foto_path character varying(100) NOT NULL,
+    face_encode double precision[] NOT NULL
+);
+
+
+ALTER TABLE public.funcionario OWNER TO postgres;
+
+--
+-- TOC entry 4888 (class 0 OID 16385)
+-- Dependencies: 217
+-- Data for Name: funcionario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.funcionario (cpf, nome, foto_path, face_encode) FROM stdin;
+\.
+
+
+--
+-- TOC entry 4742 (class 2606 OID 16394)
+-- Name: funcionario funcionario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.funcionario
+    ADD CONSTRAINT funcionario_pkey PRIMARY KEY (cpf);
+
+
+-- Completed on 2025-04-24 09:34:25
+
+--
+-- PostgreSQL database dump complete
+--
+
