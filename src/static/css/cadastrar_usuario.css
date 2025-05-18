@@ -1,0 +1,157 @@
+.main-inputs {
+    display: grid;
+    gap: 15px;
+    padding: 15px;
+}
+.main-inputs input {
+    width: 100%;
+    background-color: #f5f5f5;
+    color: #232323;
+    font-size: 1rem;
+    border: 2px solid #e2e2e2;
+    padding: 15px;
+}
+.main-inputs input:hover {
+    background-color: #fff;
+    transition: background-color 0.2s;
+}
+.main-inputs input:focus {
+    border-color: #0569c8;
+    outline: none;
+    transition: border 0.2s;
+}
+.input-obrigatorio {
+    position: relative;
+}
+.input-obrigatorio::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 10px solid red;
+    border-bottom: 10px solid transparent;
+}
+
+
+.main-inputs-container, .main-inputs-photo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+}
+.main-inputs-container > div:first-of-type, .main-inputs-photo > div:first-of-type {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-color: #f5f5f5;
+    border: 3px dashed #e2e2e2;
+    width: 100%;
+    height: 300px;
+    cursor: pointer;
+}
+.main-inputs-container > div:first-of-type:hover {
+    background-color: #fff;
+    transition: background-color 0.2s;
+}
+.main-inputs-container > div:first-of-type:active {
+    background-color: #e2e2e2;
+    border: 2px solid #0569c8;
+    transition: background-color 0s, border 0s;
+}
+
+
+.main-inputs-container-svg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    opacity: 50%;
+}
+.main-inputs-container-svg svg {
+    fill: #757575;
+    height: 50%;
+}
+.main-inputs-container-svg div {
+    font-size: 1.5rem;
+    color: #757575;
+}
+
+
+.main-inputs-photo-video-wrapper {
+    position: relative;
+    width: 400px;
+    overflow: hidden;
+}
+.main-inputs-photo-video-wrapper video {
+    transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.main-inputs-photo-video-wrapper-facebox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    height: 90%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    border-radius: 80% / 60%;
+    box-shadow:
+    0 0 0 100rem #00000060,
+    inset 0 0 0 0.3rem #0569c8;
+}
+
+
+.main-inputs-photo button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 10;
+    padding: 10px;
+    border: 2px solid #e2e2e2;
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    color: #232323;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.main-inputs-photo button:hover {
+    background-color: #fff;
+    transition: background-color 0.2s;
+}
+.main-inputs-photo button:active {
+    background-color: #e2e2e2;
+    border-color: #0569c8;
+    transition: background-color 0s, border-color 0s;
+}
+
+
+.main-inputs-enviar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.main-inputs-enviar button{
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0569c8;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.main-inputs-enviar button:hover {
+    background-color: #0784f9;
+    transition: background-color 0.2s;
+}
+.main-inputs-enviar button:active {
+    background-color: #045daf;
+    transition: background-color 0s;
+}

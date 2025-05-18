@@ -1,0 +1,26 @@
+.main-buttons {
+    padding: 15px;
+}
+.main-buttons button {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0569c8;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.main-buttons button:hover {
+    background-color: #0784f9;
+    transition: background-color 0.2s;
+}
+.main-buttons button:active {
+    background-color: #045daf;
+    transition: background-color 0s;
+}
+.main-buttons button:last-child {
+    margin-bottom: 0;
+}
