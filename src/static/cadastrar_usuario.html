@@ -2,9 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <title>Cadastrar Usuário</title>
     <link rel="stylesheet" href="static/css/cadastrar_usuario.css">
     <link rel="stylesheet" href="static/css/style.css">
@@ -32,16 +37,17 @@
                     <p>Biometria Facial:</p>
                     <div class="main-inputs-photo input-obrigatorio" id=camera-container style="display:none;">
                         <div>
-                            <div class="main-inputs-photo-video-wrapper">
-                                <video autoplay></video>
+                            <div id="loading-camera" style="display:none;">Carregando câmera...</div>
+                            <div class="main-inputs-photo-video-wrapper" id="camera" style="display:none;">
+                                <video id="video" autoplay></video>
                                 <div class="main-inputs-photo-video-wrapper-facebox"></div>
                             </div>
-                            <button onclick="capturarFoto()">Capturar</button>
+                            <button type="button" id="capture-camera-button" style="display:none;" onclick="capturarFoto()">Capturar</button>
                         </div>
                     </div>
-                    <div class="main-inputs-container input-obrigatorio" id="photo-container" onclick="abrirCamera()">
+                    <div class="main-inputs-container input-obrigatorio" id="add-photo-container" role="button" onclick="abrirCamera()">
                         <div>
-                            <div class="main-inputs-container-svg">
+                            <div class="main-inputs-container-svg" id="main-inputs-container-svg">
                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 1080.000000 1080.000000" preserveAspectRatio="xMidYMid meet">
                                     <g transform="translate(0.000000,1080.000000) scale(0.100000,-0.100000)" stroke="none">
                                         <path d="M7765 10569 c-298 -40 -444 -71 -625 -134 -436 -153 -860 -435 -1124 -750 -92 -109 -198 -246 -246 -318 l-25 -37 -530 -1 c-291 -1 -1250 -5 -2130 -8 l-1600 -6 -124 -43 c-531 -184 -860 -531 -1001 -1054 l-30 -113 0 -3205 0 -3205 30 -111 c32 -122 74 -226 147 -367 200 -387 649 -691 1073 -728 169 -14 4053 -22 5320 -11 1180 11 1104 7 1306 76 235 79 456 227 611 406 157 183 259 386 336 670 13 47 16 309 21 1895 3 1012 9 1888 12 1947 l7 108 66 37 c737 409 1215 1102 1348 1953 25 163 25 577 0 740 -64 407 -195 756 -398 1060 -419 627 -1011 1022 -1744 1164 -175 34 -565 53 -700 35z m435 -493 c512 -58 938 -256 1288 -600 369 -361 590 -815 643 -1315 15 -141 7 -428 -16 -561 -48 -290 -158 -576 -317 -829 -80 -127 -152 -212 -305 -362 -243 -238 -431 -363 -718 -475 -787 -307 -1690 -118 -2300 483 -331 325 -575 831 -616 1276 -14 148 -6 487 15 607 105 623 504 1189 1065 1510 372 213 846 312 1261 266z m-2700 -1250 c0 -3 -15 -58 -34 -123 -76 -263 -106 -480 -107 -763 0 -206 8 -306 42 -485 158 -842 680 -1522 1463 -1901 259 -126 577 -215 871 -245 212 -21 632 3 845 50 56 12 87 15 91 9 24 -38 23 -3360 0 -3578 -15 -140 -23 -166 -87 -295 -95 -194 -232 -331 -429 -430 -200 -100 187 -90 -3410 -90 l-3170 0 -85 29 c-163 55 -282 127 -395 241 -122 121 -236 315 -255 435 -6 36 -15 245 -20 465 -11 501 -12 5284 0 5650 7 248 10 277 34 358 50 168 121 282 262 417 106 102 229 181 339 217 69 22 105 27 255 33 188 7 3790 13 3790 6z"/>
@@ -53,6 +59,7 @@
                                 <div>Adicionar Imagem</div>
                             </div>
                             <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+                            <img id="photo-preview" style="display: none" />
                         </div>
                     </div>
                 </div>
@@ -67,7 +74,7 @@
                 <div>
                     <p>Telefone Celular:</p>
                     <div class="input-obrigatorio">
-                        <input type="text" id="telCelular" placeholder="(00) 90000-0000">
+                        <input type="text" id="celular" placeholder="(00) 90000-0000">
                     </div>
                 </div>
 

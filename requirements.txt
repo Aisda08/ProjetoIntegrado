@@ -21,3 +21,4 @@ Passo a passo para instalar os pacotes Python:
     5. Escreva: pip install psycopg2
     6. Escreva: pip install fastapi
     7. Escreva: pip install uvicorn
+    8. Escreva: pip install pydantic[email]
