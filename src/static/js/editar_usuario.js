@@ -1,4 +1,5 @@
 const BASE_URL = `http://${window.location.hostname}:5000`;
+let imagemBase64 = "";
 
 function url(path) {
     return `${BASE_URL}${path}`;
@@ -41,7 +42,8 @@ async function carregarDadosUsuario() {
         document.getElementById("nome").value = usuario.nome;
         document.getElementById("cpf").value = formatarCPF(usuario.cpf);
         
-        document.getElementById("photo-preview").src = usuario.foto_path;
+        imagemBase64 = usuario.foto_path;
+        document.getElementById("photo-preview").src = imagemBase64;
 
         document.getElementById("email").value = usuario.email;
         document.getElementById("celular").value = formatarCelular(usuario.celular);
@@ -68,7 +70,7 @@ async function deletarUsuario() {
     }
 }
 
-function validaFoto() {
+function validarFoto() {
     return typeof imagemBase64 === 'string' && imagemBase64.startsWith('data:image/');
 }
 
@@ -132,26 +134,28 @@ async function atualizarUsuario() {
     const nome = document.getElementById("nome").value.trim();
     const email = document.getElementById("email").value.trim();
     const celular = document.getElementById("celular").value.replace(/\D/g, "");
-    const foto_base64 = imagemBase64;
 
     // Validar dados em branco.
     if (!cpf || !nome || !email || !celular) {
         return alert("Preencha todos os campos obrigatórios.");
     }
 
-    if (!validaFoto()) return alert("Foto inválida.")
-
     if (!validarEmail(email)) return alert("Email inválido.");
 
     if (!validarCelular(celular)) return alert("Número de celular inválido.");
 
-    const dadosAtualizados = { cpf, nome, email, celular, foto_base64};
+    const dadosAtualizados = { cpf, nome, email, celular };
+
+    if (imagemBase64.startsWith('data:image/')) {
+        if (!validarFoto()) return alert("Foto inválida.")
+        dadosAtualizados.foto_base64 = imagemBase64;
+    }
 
     try {
         await fetchJson(url(`/api/usuarios/${cpf}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dadosAtualizados),
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dadosAtualizados),
         });
         alert("Usuário atualizado com sucesso.");
         window.location.href = url("/gerenciar_usuarios");
@@ -159,5 +163,6 @@ async function atualizarUsuario() {
         alert("Erro ao atualizar o usuário: " + erro.message);
     }
 }
+
 
 window.onload = carregarDadosUsuario;
