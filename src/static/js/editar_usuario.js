@@ -1,4 +1,4 @@
-const BASE_URL = `http://${window.location.hostname}:5000`;
+const BASE_URL = `http://${window.location.hostname}:${window.location.port}`;
 let imagemBase64 = "";
 
 function url(path) {
@@ -108,8 +108,7 @@ function capturarFoto() {
     const video = document.getElementById("video");
     const canvas = document.getElementById("canvas");
     const context = canvas.getContext("2d");
-    
-    // Espelhar imagem no canvas para manter o efeito de espelho na captura
+
     context.translate(canvas.width, 0);
     context.scale(-1, 1);
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -118,7 +117,6 @@ function capturarFoto() {
     imagemBase64 = canvas.toDataURL("image/png");
     document.getElementById("photo-preview").src = imagemBase64;
 
-    // Para a câmera após capturar
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
     }
@@ -135,7 +133,6 @@ async function atualizarUsuario() {
     const email = document.getElementById("email").value.trim();
     const celular = document.getElementById("celular").value.replace(/\D/g, "");
 
-    // Validar dados em branco.
     if (!cpf || !nome || !email || !celular) {
         return alert("Preencha todos os campos obrigatórios.");
     }
@@ -163,6 +160,5 @@ async function atualizarUsuario() {
         alert("Erro ao atualizar o usuário: " + erro.message);
     }
 }
-
 
 window.onload = carregarDadosUsuario;

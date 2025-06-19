@@ -85,7 +85,7 @@ async function enviar() {
     if (!validarCelular(celular)) return alert("Número de celular inválido.");
 
     try {
-        const resposta = await fetch('http://localhost:5000/inserirUsuario', {
+        const resposta = await fetch(`http://localhost:${window.location.port}/inserirUsuario`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome, cpf, email, celular, foto_base64: imagemBase64 })

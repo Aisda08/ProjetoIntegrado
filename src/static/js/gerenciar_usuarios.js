@@ -8,7 +8,7 @@ function formatarCelular(celular) {
 
 async function carregarUsuarios() {
     try {
-        const resposta = await fetch("http://127.0.0.1:5000/api/usuarios");
+        const resposta = await fetch(`http://127.0.0.1:${window.location.port}/api/usuarios`);
         const usuarios = await resposta.json();
         const corpoTabela = document.querySelector("#tabelaUsuarios tbody");
 

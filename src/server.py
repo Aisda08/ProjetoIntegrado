@@ -1,3 +1,5 @@
+# uvicorn src.server:app --reload --port 5000
+
 import os
 import base64
 import face_recognition
@@ -19,13 +21,12 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Conecta ao banco de dados.
 conn = db.conectar()
 cursor = conn.cursor()
 
@@ -65,10 +66,10 @@ class Funcionario(BaseModel):
         self.validar_celular()
 
     def processar_imagem(self):
-        header, encode64 = self.foto_base64.split(",", 1) # Separa cabeçalho da string base64.
-        img_bin = base64.b64decode(encode64) # Transforma encode_base64 em dados binários.
-        img_rgb = Image.open(BytesIO(img_bin)).convert("RGB") # Converte para RBG.
-        img = numpy.array(img_rgb) # Converte imagem para array.
+        header, encode64 = self.foto_base64.split(",", 1)
+        img_bin = base64.b64decode(encode64)
+        img_rgb = Image.open(BytesIO(img_bin)).convert("RGB")
+        img = numpy.array(img_rgb)
 
         faces = face_recognition.face_locations(img)
         if not faces:
@@ -88,19 +89,16 @@ class Funcionario(BaseModel):
         os.makedirs(PASTA_IMAGENS, exist_ok=True)
         img_bin = self.processar_imagem()
 
-        # Criar nome único para a imagem
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         nome_arquivo = f"{self.cpf}_{timestamp}.png"
         self.foto_path = os.path.join(PASTA_IMAGENS, nome_arquivo)
 
-        # Salva a imagem.
         with open(self.foto_path, "wb") as fp:
             fp.write(img_bin)
 
     def inserir_bd(self):
         self.salvar_imagem()
 
-        # Executa query SQL.
         query = "INSERT INTO funcionario (cpf, nome, foto_path, face_encode, email, celular) VALUES (%s, %s, %s, %s, %s, %s)"
         cursor.execute(query, (self.cpf, self.nome, self.foto_path, self.face_encode, self.email, self.celular))
         conn.commit()
@@ -184,7 +182,6 @@ class UsuarioAtualizacao(BaseModel):
 @app.put("/api/usuarios/{cpf}")
 def atualizar_usuario(cpf: str, dados: UsuarioAtualizacao):
     try:
-        # Atualiza dados básicos
         query = """
             UPDATE funcionario 
             SET nome = %s, email = %s, celular = %s 
@@ -192,7 +189,6 @@ def atualizar_usuario(cpf: str, dados: UsuarioAtualizacao):
         """
         cursor.execute(query, (dados.nome, dados.email, dados.celular, cpf))
 
-        # Se foto nova for enviada, processa e atualiza.
         if dados.foto_base64:
             funcionario_temp = Funcionario(
                 nome=dados.nome,
@@ -233,7 +229,6 @@ def deletar_usuario(cpf:str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Serve a pasta static como arquivos estáticos
 current_dir = os.path.dirname(__file__)
 STATIC_DIR = os.path.join(current_dir, "static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
