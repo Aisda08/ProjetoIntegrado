@@ -12,6 +12,17 @@ async function carregarUsuarios() {
         const usuarios = await resposta.json();
         const corpoTabela = document.querySelector("#tabelaUsuarios tbody");
 
+        if (usuarios.length === 0) {
+            const linha = document.createElement("tr");
+            const celula = document.createElement("td");
+            celula.colSpan = 4;
+            celula.style.textAlign = "center";
+            celula.textContent = "Nenhum Usuário Cadastrado!";
+            linha.appendChild(celula);
+            corpoTabela.appendChild(linha);
+            return;
+        }
+
         usuarios.forEach(usuario => {
             const linha = document.createElement("tr");
 

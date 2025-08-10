@@ -27,6 +27,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+db.criar_bdd()
+
 conn = db.conectar()
 cursor = conn.cursor()
 

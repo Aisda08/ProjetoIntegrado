@@ -1,90 +1,127 @@
-# python -m main.py
-
 import cv2
 import face_recognition
 from database import db
+import numpy as np
+import threading
+import queue
+
+TOLERANCIA = 0.50
+FRAME_SCALE = 0.25
+RECOGNITION_INTERVAL = 30
 
 conn = db.conectar()
 cursor = conn.cursor()
+cursor.execute("SELECT nome, face_encode FROM funcionario")
+db_encodings = cursor.fetchall()
+known_names = [name for name, _ in db_encodings]
+known_encodings = [enc for _, enc in db_encodings]
 
+frame_queue = queue.Queue(maxsize=1)
+result_lock = threading.Lock()
+
+last_face_locations = []
+last_face_names = []
+last_color = (0, 0, 255)
+
+frame_counter = 0
+
+def process_faces():
+    global last_face_locations, last_face_names, last_color, frame_counter
+    while True:
+        frame = frame_queue.get()
+        if frame is None:
+            break
+
+        frame_counter += 1
+
+        # Reduz resolução para detecção
+        small_frame = cv2.resize(frame, (0, 0), fx=FRAME_SCALE, fy=FRAME_SCALE)
+        rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+
+        # Detecta rostos todo frame
+        face_locations = face_recognition.face_locations(rgb_small_frame, model="hog")
+
+        face_names = []
+        color = last_color
+
+        # Só tenta reconhecer a cada X frames
+        if face_locations and frame_counter % RECOGNITION_INTERVAL == 0:
+            face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+
+            if face_encodings:
+                distances = face_recognition.face_distance(known_encodings, face_encodings[0])
+                best_match_index = np.argmin(distances)
+
+                if distances[best_match_index] < TOLERANCIA:
+                    face_names.append(known_names[best_match_index])
+                    color = (0, 255, 0)
+                else:
+                    face_names.append("Desconhecido")
+                    color = (0, 0, 255)
+            else:
+                face_names = last_face_names
+        else:
+            # Usa último nome detectado para manter na tela
+            face_names = last_face_names
+
+        with result_lock:
+            last_face_locations = face_locations
+            last_face_names = face_names
+            last_color = color
+
+# Inicia thread de processamento
+thread = threading.Thread(target=process_faces, daemon=True)
+thread.start()
+
+# Captura de vídeo
 camCapture = cv2.VideoCapture(0)
 
 try:
     while True:
-        _, frame = camCapture.read()
+        ret, frame = camCapture.read()
+        if not ret:
+            break
+
         frame = cv2.flip(frame, 1)
 
-        faces_loc = face_recognition.face_locations(frame)
-        if faces_loc: 
-            faces_loc = sorted(faces_loc, 
-                        key=lambda f: (f[2] - f[0]) * (f[1] - f[3]), 
-                        reverse=True)
-            faces_loc = [faces_loc[0]]
-        
-        faces_enc = face_recognition.face_encodings(frame, faces_loc)
+        if not frame_queue.full():
+            frame_queue.put(frame)
 
-        if faces_enc:
-            cursor.execute("SELECT nome, face_encode FROM funcionario")
-            db_encodings = cursor.fetchall()
+        with result_lock:
+            for (top, right, bottom, left), name in zip(last_face_locations, last_face_names):
+                # Escalar de volta
+                top = int(top / FRAME_SCALE)
+                right = int(right / FRAME_SCALE)
+                bottom = int(bottom / FRAME_SCALE)
+                left = int(left / FRAME_SCALE)
 
-            known_encodings = []
-            known_names = []
-            for name, enc in db_encodings:
-                known_names.append(name)
-                known_encodings.append(enc)
+                cv2.rectangle(frame, (left, top), (right, bottom), last_color, 2)
 
-            matches = face_recognition.compare_faces(known_encodings, faces_enc[0])
-
-            if True in matches:
-                match_index = matches.index(True)
-                label = f"Reconhecido: {known_names[match_index]}"
-                color = (0, 255, 0)  # Verde
-
-                # Processamento do texto centralizado no canto inferior
                 frame_height, frame_width = frame.shape[:2]
+                if name != "Desconhecido":
+                    title_text = "Reconhecido:"
+                    name_text = name
+                    (title_width, _), _ = cv2.getTextSize(title_text, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
+                    (name_width, _), _ = cv2.getTextSize(name_text, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
+                    title_x = (frame_width - title_width) // 2
+                    name_x = (frame_width - name_width) // 2
+                    title_y = frame_height - 45
+                    name_y = frame_height - 20
+                    cv2.putText(frame, title_text, (title_x, title_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, last_color, 2)
+                    cv2.putText(frame, name_text, (name_x, name_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, last_color, 2)
+                else:
+                    (text_width, _), _ = cv2.getTextSize(name, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
+                    text_x = (frame_width - text_width) // 2
+                    text_y = frame_height - 20
+                    cv2.putText(frame, name, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, last_color, 2)
 
-                # Dividir o texto em duas linhas
-                title_text = "Reconhecido:"
-                name_text = label.replace("Reconhecido: ", "")
+        cv2.imshow("Trabalho de Conclusao de Curso - Reconhecimento Facial", frame)
 
-                # Obter tamanhos dos textos
-                (title_width, _), _ = cv2.getTextSize(title_text, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
-                (name_width, name_height), _ = cv2.getTextSize(name_text, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
-
-                # Centralizar os textos
-                title_x = (frame_width - title_width) // 2
-                name_x = (frame_width - name_width) // 2
-                title_y = frame_height - 45
-                name_y = frame_height - 20
-
-                # Desenhar os textos
-                cv2.putText(frame, title_text, (title_x, title_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
-                cv2.putText(frame, name_text, (name_x, name_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
-
-            else:
-                label = "Desconhecido"
-                color = (0, 0, 255)  # Vermelho
-
-                # Caso 'Desconhecido', apenas uma linha
-                frame_height, frame_width = frame.shape[:2]
-                (text_width, text_height), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
-                text_x = (frame_width - text_width) // 2
-                text_y = frame_height - 20
-                cv2.putText(frame, label, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
-
-        # Desenhar os retângulos ao redor dos rostos
-        for (top, right, bottom, left), face_encoding in zip(faces_loc, faces_enc):
-            cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
-
-
-        title = "Trabalho de Conclusão - Reconhecimento Facial"
-        cv2.imshow(title, frame)
-
-        key = cv2.waitKey(1)
-        if key == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
 finally:
+    frame_queue.put(None)
     camCapture.release()
     cv2.destroyAllWindows()
     cursor.close()
