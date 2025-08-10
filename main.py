@@ -77,7 +77,7 @@ try:
             cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
 
 
-        title = "Projeto Integrado - Reconhecimento Facial"
+        title = "Trabalho de Conclusão - Reconhecimento Facial"
         cv2.imshow(title, frame)
 
         key = cv2.waitKey(1)

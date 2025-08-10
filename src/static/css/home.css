@@ -1,7 +1,7 @@
-.main-buttons {
+.main-content {
     padding: 15px;
 }
-.main-buttons button {
+.main-content button {
     width: 100%;
     padding: 15px;
     margin-bottom: 15px;
@@ -13,14 +13,27 @@
     font-weight: 600;
     cursor: pointer;
 }
-.main-buttons button:hover {
+.main-content button:hover {
     background-color: #0784f9;
     transition: background-color 0.2s;
 }
-.main-buttons button:active {
+.main-content button:active {
     background-color: #045daf;
     transition: background-color 0s;
 }
-.main-buttons button:last-child {
+.main-content button:last-child {
     margin-bottom: 0;
+}
+
+.main-login {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.main-login input {
+    height: 7svh;
+    background-color:whitesmoke;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border: solid 2px whitesmoke;
 }

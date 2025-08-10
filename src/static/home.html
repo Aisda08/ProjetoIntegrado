@@ -10,22 +10,34 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon_io/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <title>Home</title>
+    <title>Login</title>
     <link rel="stylesheet" href="static/css/home.css">
     <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
     <div class="wrapper">
         <main>
-            <h1>Home</h1>
-            <div class="main-buttons">
-                <button onclick="redirecionar('cadastrar_usuario')">Cadastrar Usuário</button>
-                <button onclick="redirecionar('gerenciar_usuarios')">Gerenciar Usuários</button>
+            <div class="login-container" style="display: block;">
+                <h1>Login</h1>
+                <div class="main-content main-login">
+                    <input id="user" placeholder="Usuário">
+                    <input id="password" type="password" placeholder="Senha">
+                    <button onclick="validarLogin()">Entrar</button>
+                </div>
+            </div>
+
+            <div class="home-container" style="display: none;">
+                <h1>Página Inicial</h1>
+                <div class="main-content">
+                    <button onclick="redirecionar('cadastrar_usuario')">Cadastrar Usuário</button>
+                    <button onclick="redirecionar('gerenciar_usuarios')">Gerenciar Usuários</button>
+                </div>
             </div>
         </main>
     </div>
 
     <script src="static/js/script.js"></script>
     <script src="static/js/redirecionar.js"></script>
+    <script src="static/js/login.js"></script>
 </body>
 </html>
