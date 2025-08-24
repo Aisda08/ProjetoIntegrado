@@ -6,10 +6,12 @@ from database import db
 import numpy as np
 import threading
 import queue
+from collections import deque
 
 TOLERANCIA = 0.50
 FRAME_SCALE = 0.25
 RECOGNITION_INTERVAL = 30
+SMOOTHING_WINDOW = 5  
 
 conn = db.conectar()
 cursor = conn.cursor()
@@ -26,6 +28,8 @@ last_face_names = []
 last_color = (0, 0, 255)
 
 frame_counter = 0
+
+smooth_locations = deque(maxlen=SMOOTHING_WINDOW)
 
 def process_faces():
     global last_face_locations, last_face_names, last_color, frame_counter
@@ -65,6 +69,14 @@ def process_faces():
         else:
             face_names = last_face_names
 
+        if face_locations:
+            smooth_locations.append(face_locations[0])  # supondo apenas 1 rosto
+            avg_top = int(np.mean([loc[0] for loc in smooth_locations]))
+            avg_right = int(np.mean([loc[1] for loc in smooth_locations]))
+            avg_bottom = int(np.mean([loc[2] for loc in smooth_locations]))
+            avg_left = int(np.mean([loc[3] for loc in smooth_locations]))
+            stable_location = (avg_top, avg_right, avg_bottom, avg_left)
+            face_locations = [stable_location]
 
         with result_lock:
             last_face_locations = face_locations
@@ -89,7 +101,6 @@ try:
 
         with result_lock:
             for (top, right, bottom, left), name in zip(last_face_locations, last_face_names):
-
                 top = int(top / FRAME_SCALE)
                 right = int(right / FRAME_SCALE)
                 bottom = int(bottom / FRAME_SCALE)
