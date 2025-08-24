@@ -232,10 +232,15 @@ def deletar_usuario(cpf:str):
 
 
 current_dir = os.path.dirname(__file__)
+
 STATIC_DIR = os.path.join(current_dir, "static")
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 IMAGENS_DIR = os.path.join("src", "img")
+
+os.makedirs(STATIC_DIR, exist_ok=True)
+os.makedirs(IMAGENS_DIR, exist_ok=True)
+
 app.mount("/fotos", StaticFiles(directory=IMAGENS_DIR), name="fotos")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # PÁGINAS.
 @app.get("/")

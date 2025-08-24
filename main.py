@@ -1,3 +1,5 @@
+# python -m main.py
+
 import cv2
 import face_recognition
 from database import db
