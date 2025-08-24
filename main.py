@@ -34,21 +34,21 @@ def process_faces():
 
         frame_counter += 1
 
-        # Reduz resolução para detecção
         small_frame = cv2.resize(frame, (0, 0), fx=FRAME_SCALE, fy=FRAME_SCALE)
         rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
 
-        # Detecta rostos todo frame
         face_locations = face_recognition.face_locations(rgb_small_frame, model="hog")
 
         face_names = []
         color = last_color
 
-        # Só tenta reconhecer a cada X frames
         if face_locations and frame_counter % RECOGNITION_INTERVAL == 0:
             face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-            if face_encodings:
+            if not known_encodings:
+                face_names = ["Desconhecido"] * len(face_locations)
+                color = (0, 0, 255)
+            elif face_encodings:
                 distances = face_recognition.face_distance(known_encodings, face_encodings[0])
                 best_match_index = np.argmin(distances)
 
@@ -61,19 +61,17 @@ def process_faces():
             else:
                 face_names = last_face_names
         else:
-            # Usa último nome detectado para manter na tela
             face_names = last_face_names
+
 
         with result_lock:
             last_face_locations = face_locations
             last_face_names = face_names
             last_color = color
 
-# Inicia thread de processamento
 thread = threading.Thread(target=process_faces, daemon=True)
 thread.start()
 
-# Captura de vídeo
 camCapture = cv2.VideoCapture(0)
 
 try:
@@ -89,7 +87,7 @@ try:
 
         with result_lock:
             for (top, right, bottom, left), name in zip(last_face_locations, last_face_names):
-                # Escalar de volta
+
                 top = int(top / FRAME_SCALE)
                 right = int(right / FRAME_SCALE)
                 bottom = int(bottom / FRAME_SCALE)
